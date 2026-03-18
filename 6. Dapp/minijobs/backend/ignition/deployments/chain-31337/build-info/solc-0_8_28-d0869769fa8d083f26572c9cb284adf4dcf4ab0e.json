@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-d0869769fa8d083f26572c9cb284adf4dcf4ab0e",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/Jobs.sol": "project/contracts/Jobs.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Jobs.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.28;\n\n///@title A Mini Job Smart contract\n///@author Ben BK\ncontract Jobs {\n\n    struct Job {\n        address author;\n        address worker;\n        string description;\n        uint price;\n        bool isFinished;\n    }\n\n    Job[] jobs;\n\n    event jobAdded(address indexed author, string description, uint price, uint id, bool isFinished);\n    event jobTaken(address indexed worker, uint id);\n    event jobIsFinishedAndPaid(address indexed author, address indexed worker, uint id, uint pricePaid);\n\n    ///@notice Allows to add a new job \n    ///@param _description the complete description of the job\n    function addJob(\n        string calldata _description\n    ) external payable {\n        Job memory thisJob = Job(msg.sender, address(0), _description, msg.value, false);\n        jobs.push(thisJob);\n        emit jobAdded(msg.sender, _description, msg.value, jobs.length - 1, false);\n    }\n\n    ///@notice Allows to take the job\n    ///@param _id the index of the job in the jobs array\n    function takeJob(uint _id) external {\n        require(msg.sender != jobs[_id].author, \"The author cannot take the job\");\n        require(jobs[_id].worker == address(0), \"Job already taken\");\n        jobs[_id].worker = msg.sender;\n        emit jobTaken(msg.sender, _id);\n    }\n\n    ///@notice Allows to end the job and to pay the worker\n    ///@param _id the id of the job in the jobs array\n    function setIsFinishedAndPay(uint _id) external {\n        require(jobs[_id].worker != address(0), \"Job not taken yet\");\n        require(msg.sender == jobs[_id].author, \"You are not the author of this job\");\n        require(!jobs[_id].isFinished, \"This job is already finished and paid\");\n        (bool received, ) = jobs[_id].worker.call{value: jobs[_id].price}('');\n        if(received) {\n            jobs[_id].isFinished = true;\n        }\n        else {\n            revert(\"The worker has not been paid, reverting the transaction...\");\n        }\n        emit jobIsFinishedAndPaid(jobs[_id].author, jobs[_id].worker, _id, jobs[_id].price);\n    }\n}"
+      }
+    }
+  }
+}

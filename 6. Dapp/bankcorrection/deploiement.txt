@@ -1,0 +1,11 @@
+Choses à faire :
+
+- vérifier le fichier hardhat.config.ts (RPC sepolia, etherscan, clé privée avec du sepolia dessus)
+- déployer et vérifier le contrat intelligent
+- récupérer l'adresse du contrat et la mettre dans le fichier de config dans le front
+- dans config/index.tsx, changer le réseau hardhat en sepolia, pareil dans context/index.tsx
+- dans le client, indiquer une url de RPC pour Sepolia et indiquer aussi le network Sepolia
+- si vous récupérez des events, alors ne pas oublier de configurer le fromBlock et le changer au numéro de bloc sur lequel vous avez déployé le contrat
+- npm run build pour builder en local et voir s'il y a des erreurs typescript
+- mettre le projet sur github
+- aller sur vercel et déployer
